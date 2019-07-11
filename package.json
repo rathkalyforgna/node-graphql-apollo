@@ -1,0 +1,27 @@
+{
+  "name": "node-graphql-apollo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --exec babel-node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.5.4",
+    "@babel/node": "^7.5.0",
+    "@babel/preset-env": "^7.5.4",
+    "nodemon": "^1.19.1"
+  },
+  "dependencies": {
+    "apollo-server": "^2.6.8",
+    "apollo-server-express": "^2.6.8",
+    "cors": "^2.8.5",
+    "dotenv": "^8.0.0",
+    "express": "^4.17.1",
+    "graphql": "^14.4.2"
+  }
+}
