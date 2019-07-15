@@ -3,11 +3,13 @@ import cors from 'cors';
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import http from 'http';
+import DataLoader from 'dataloader';
 import { ApolloServer, AuthenticationError } from 'apollo-server-express';
 
 import schema from './schema';
 import resolvers from './resolvers';
 import models, { sequelize } from './models';
+import loaders from './loaders';
 
 const app = express();
 
@@ -31,7 +33,9 @@ const server = new ApolloServer({
   formatError: error => {
     // remove the internal sequelize error message
     // leave only the important validation error
-    const message = error.message.replace('SequelizeValidationError: ', '').replace('Validation error: ', '');
+    const message = error.message
+      .replace('SequelizeValidationError: ', '')
+      .replace('Validation error: ', '');
     
     return {
       ...error,
@@ -40,7 +44,12 @@ const server = new ApolloServer({
   },
   context: async ({ req, connection }) => {
     if (connection) {
-      return { models };
+      return { 
+        models,
+        loaders: {
+          user: new DataLoader(keys => loaders.user.batchUsers(keys, models)),
+        }, 
+      };
     }
 
     if (req) {
@@ -50,6 +59,9 @@ const server = new ApolloServer({
         models,
         me,
         secret: process.env.SECRET,
+        loaders: {
+          user: new DataLoader(keys => loaders.user.batchUsers(keys, models)),
+        },
       }
     }
   },
@@ -61,6 +73,8 @@ const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
 const eraseDatabaseOnSync = true;
+
+const isTest = !!process.env.TEST_DATABASE;
 
 sequelize.sync({ force: eraseDatabaseOnSync }).then(async () => {
   if (eraseDatabaseOnSync) {
