@@ -28,8 +28,6 @@ const getMe = async req => {
 };
 
 const server = new ApolloServer({
-  introspection: true,
-  playground: false,
   typeDefs: schema,
   resolvers,
   formatError: error => {
@@ -67,6 +65,10 @@ const server = new ApolloServer({
       }
     }
   },
+  debug: true,
+  tracing: true,
+  introspection: true,
+  playground: true
 });
 
 server.applyMiddleware({ app, path: '/graphql' });
